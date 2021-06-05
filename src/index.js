@@ -14,7 +14,12 @@ class Frequency extends React.Component {
   render() {
     return (
       <div>
-        <h1>{this.props.frequency}</h1>
+        <div className="frequency-box">
+        {this.props.frequency}
+        </div>
+        <div className="mhz-box">
+        MHz
+        </div>
       </div>
     );
   }
