@@ -57,6 +57,50 @@ class Frequency extends React.Component {
     );
   }
 
+  function SidebandButton(props)
+  {
+    return (
+      <button 
+          className={props.buttonclass} 
+          onClick={() => props.onClick()}>
+        {props.value}
+      </button>
+    );
+  }
+
+  class Sideband extends React.Component {
+
+    constructor(props){
+      super(props)
+      this.state ={
+        sideband: this.props.sideband
+      }
+    }
+
+    renderButton(i) {
+      return (
+        <SidebandButton value={i} buttonclass={this.state.sideband==i ? "sideband-button-pressed" : "sideband-button"} 
+          onClick={() => this.onClick(i)}
+        />
+      );
+    }
+
+    onClick(i) {
+      this.setState({ sideband : i });
+      this.props.keypad.handleSidebandClick(i);
+    }
+
+    render() {
+      return (
+        <div className="sideband-box">
+          {this.renderButton('USB')}
+          {this.renderButton('LSB')}
+          </div>
+      );
+    }
+  }
+
+
   class FrequencyKeypad extends React.Component {
 
     renderButton(i) {
@@ -103,10 +147,12 @@ class Frequency extends React.Component {
       super(props);
       
       this.state = {
+        sideband: this.props.sideband,
         frequency: this.format(this.props.frequency),
         typed: ''
       };
 
+      this.initRadio( this.props.frequency, this.props.sideband );
     }
 
     format(s) {
@@ -114,11 +160,31 @@ class Frequency extends React.Component {
       return sprintf('%2.6f', s )
     }
 
-    sendCommand( freq )
-    {
-      fetch('http://esp32-radio.attlocal.net/command?frequency=' + freq )
+    initRadio( freq, sideband ) {
+      var command = 'frequency=' + freq + "&sideband=" + sideband;
+      this.sendCommand( command );
+    }
+    
+    changeFrequency( freq ) {
+      var command = 'frequency=' + freq;
+      this.sendCommand( command );
+    }
+
+    changeSideband( sideband ) {
+      var command = 'sideband=' + sideband;
+      this.sendCommand( command );
+    }
+
+    sendCommand( c ) {
+      console.log( c );
+      fetch("http://esp32-radio.attlocal.net/command?" + c )
         .then(response => response.json())
         .then(data => console.log(data));
+    }
+
+    handleSidebandClick(i) {
+      this.setState({ sideband : i });
+      this.changeSideband(i);
     }
 
     handlePanelClick(i) {
@@ -132,7 +198,7 @@ class Frequency extends React.Component {
       if ( i == 'E') {
           s = this.format( this.state.typed ) ;
           this.setState({ typed : '', frequency : s });
-          this.sendCommand(s);
+          this.changeFrequency(s);
       }
 
       else {
@@ -149,6 +215,7 @@ class Frequency extends React.Component {
           </div>
           <div className="frequency-updown">
             <FrequencyUpDown />
+            <Sideband keypad={this} sideband={this.state.sideband}/>
           </div>
           <div className="frequency-keypad">
             <FrequencyKeypad keypad={this} />
@@ -161,7 +228,7 @@ class Frequency extends React.Component {
   // ========================================
   
   ReactDOM.render(
-    <RadioPanel frequency={'7.2'} />,
+    <RadioPanel frequency={'14.2'} sideband={'USB'} />,
     document.getElementById('root')
   );
   
