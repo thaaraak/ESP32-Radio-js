@@ -117,6 +117,19 @@
     width: 40px;
   }
 
+  .volume-slider {
+    color: rgb(12, 12, 12);
+    background: rgb(206, 207, 205);
+    border: 1px solid rgb(14, 13, 13);
+    float: left;
+    margin-left: 4px;
+    line-height: 32px;
+    height: 190px;
+    padding: 0;
+    text-align: right;
+    width: 40px;
+  }
+
   .keypad {
     color: rgb(12, 12, 12);
     background: rgb(206, 207, 205);

@@ -2,6 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+
+// Using an ES6 transpiler like Babel
+import Slider from 'react-rangeslider';
+ 
+// To include the default styles
+import 'react-rangeslider/lib/index.css';
+ 
+
+
 class Frequency extends React.Component {
 
   constructor(props) {
@@ -50,16 +59,7 @@ class Frequency extends React.Component {
 
   }
 
-  function KeyButton(props)
-  {
-    return (
-      <button 
-          className="panel-button" 
-          onClick={() => props.onClick()}>
-        {props.value}
-      </button>
-    );
-  }
+
 
   function SidebandButton(props)
   {
@@ -104,6 +104,16 @@ class Frequency extends React.Component {
     }
   }
 
+  function KeyButton(props)
+  {
+    return (
+      <button 
+          className="panel-button" 
+          onClick={() => props.onClick()}>
+        {props.value}
+      </button>
+    );
+  }
 
   class FrequencyKeypad extends React.Component {
 
@@ -116,6 +126,7 @@ class Frequency extends React.Component {
     }
 
     onClick(i) {
+      console.log(i);
       this.props.keypad.handlePanelClick(i);
     }
 
@@ -153,7 +164,8 @@ class Frequency extends React.Component {
       this.state = {
         sideband: this.props.sideband,
         frequency: this.format(this.props.frequency),
-        typed: ''
+        typed: '',
+        volume: 1
       };
 
       this.initRadio( this.props.frequency, this.props.sideband );
@@ -176,6 +188,11 @@ class Frequency extends React.Component {
 
     changeSideband( sideband ) {
       var command = 'sideband=' + sideband;
+      this.sendCommand( command );
+    }
+
+    changeVolume( vol ) {
+      var command = 'gain=' + vol;
       this.sendCommand( command );
     }
 
@@ -202,6 +219,14 @@ class Frequency extends React.Component {
     handleSidebandClick(i) {
       this.setState({ sideband : i });
       this.changeSideband(i);
+    }
+
+    handleOnChange = (value) => {
+      this.setState({ volume: value });
+    }
+    
+    handleOnChangeComplete = (value) => {
+      this.changeVolume(this.state.volume);
     }
 
     handlePanelClick(i) {
@@ -236,6 +261,16 @@ class Frequency extends React.Component {
           </div>
           <div className="frequency-keypad">
             <FrequencyKeypad keypad={this} />
+          </div>
+          <div className="volume-slider">
+            <Slider
+              min="1"
+              max="20"
+              value={this.state.volume}
+              orientation="vertical"
+              onChange={this.handleOnChange}
+              onChangeComplete={this.handleOnChangeComplete}
+            />
           </div>
         </div>
       );
