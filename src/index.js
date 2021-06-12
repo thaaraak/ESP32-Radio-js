@@ -35,11 +35,15 @@ class Frequency extends React.Component {
         }
     }
 
+    onClick(i) {
+      this.props.keypad.handleUpDownClick(i);
+    }
+
     render() {
       return (
         <div>
-          <button className="updown-button"><img src="/upsmall.png" alt="up"/></button>
-          <button className="updown-button"><img src="/downsmall.png" alt="down"/></button>
+          <button onClick={() => this.onClick('up')} className="updown-button"><img src="/upsmall.png" alt="up"/></button>
+          <button onClick={() => this.onClick('down')} className="updown-button"><img src="/downsmall.png" alt="down"/></button>
         </div>
       );
     }
@@ -164,7 +168,7 @@ class Frequency extends React.Component {
       var command = 'frequency=' + freq + "&sideband=" + sideband;
       this.sendCommand( command );
     }
-    
+
     changeFrequency( freq ) {
       var command = 'frequency=' + freq;
       this.sendCommand( command );
@@ -180,6 +184,19 @@ class Frequency extends React.Component {
       fetch("http://esp32-radio.attlocal.net/command?" + c )
         .then(response => response.json())
         .then(data => console.log(data));
+    }
+
+    handleUpDownClick(i) {
+      var mult = 1;
+      if ( i == 'down' ) {
+        mult = -1;
+      }
+
+      var freq = parseFloat( this.state.frequency ) + mult*.0005;
+      var sprintf = require('sprintf-js').sprintf;
+      freq = sprintf('%2.6f', freq ); 
+      this.changeFrequency( freq );
+      this.setState( { frequency : freq } );
     }
 
     handleSidebandClick(i) {
@@ -214,7 +231,7 @@ class Frequency extends React.Component {
             <Frequency frequency={this.state.frequency}/>
           </div>
           <div className="frequency-updown">
-            <FrequencyUpDown />
+            <FrequencyUpDown keypad={this} />
             <Sideband keypad={this} sideband={this.state.sideband}/>
           </div>
           <div className="frequency-keypad">
