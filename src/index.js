@@ -26,9 +26,6 @@ class Frequency extends React.Component {
         <div className="frequency-box">
         {this.props.frequency}
         </div>
-        <div className="mhz-box">
-        MHz
-        </div>
       </div>
     );
   }
